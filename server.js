@@ -7,6 +7,22 @@ const bodyParser = require('body-parser');
 var cors = require('cors');
 
 var app = express();
+const knex = require('knex')
+
+const db = knex({
+  client: 'pg',
+  connection: {
+    host: '127.0.0.1',
+    user: 'postgres',
+    password: 'Datahero45!',
+    database: 'urlshortenernode'
+  }
+});
+
+// db.select('*').from('urls').then(data => {
+//   console.log(data);
+// })
+
 const dns = require('dns');
 // Basic Configuration 
 var port = process.env.PORT || 3000;
@@ -47,6 +63,49 @@ app.post('/api/shorturl/new', function (req, res) {
       return
     }
   })
+
+  let urlWasLocated = false;
+  // db.select('url').from('urls').where('url', '=', input).then(data => {
+  //   console.log(data[0])
+  //   urlWasLocated = true;
+  //   console.log("inside select/locate urlWasLocated", urlWasLocated)
+  // }).catch(err => {
+  //   //res.json('could not locate url')
+  //   console.log('could not locate url')
+  //   console.log(err)
+  // })
+
+  db.transaction(trx => {
+    trx.select('*').from('urls').where('url', '=', input).then(data => {
+      console.log(data[0])
+      res.json({"original_url": data[0].url, "short_url": data[0].id })
+      urlWasLocated = true;
+      console.log("inside select/locate urlWasLocated", urlWasLocated)
+    }).catch(err => {
+      console.log('could not locate url')
+      //console.log(err)
+    })
+  }).catch(err => {
+    console.log('could not locate url')
+    //console.log(err)
+  })
+
+  console.log("urlWasLocated", urlWasLocated)
+  if(urlWasLocated === false) {
+    db.transaction(trx => {
+      trx.insert({
+        url: input
+      }).into('urls')
+      .catch(err => {
+        console.log('could not submit url')
+        //console.log(err)
+      })
+    }).catch(err => {
+        console.log('could not submit url')
+        //console.log(err)
+    })
+  }
+  
 })
   
 // your first API endpoint... 

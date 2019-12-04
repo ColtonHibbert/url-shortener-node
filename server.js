@@ -65,15 +65,6 @@ app.post('/api/shorturl/new', function (req, res) {
   })
 
   let urlWasLocated = false;
-  // db.select('url').from('urls').where('url', '=', input).then(data => {
-  //   console.log(data[0])
-  //   urlWasLocated = true;
-  //   console.log("inside select/locate urlWasLocated", urlWasLocated)
-  // }).catch(err => {
-  //   //res.json('could not locate url')
-  //   console.log('could not locate url')
-  //   console.log(err)
-  // })
 
   db.transaction(trx => {
     trx.select('*').from('urls').where('url', '=', input).then(data => {
@@ -105,6 +96,10 @@ app.post('/api/shorturl/new', function (req, res) {
         //console.log(err)
     })
   }
+  
+})
+
+app.get('/api/shorturl/*', function(req, res) {
   
 })
   

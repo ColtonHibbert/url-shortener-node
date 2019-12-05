@@ -92,7 +92,7 @@ app.post('/api/shorturl/new', function (req, res) {
       })
     }).catch(err => {
       console.log('could not locate url')
-      //console.log(err)
+      console.log(err)
     })
         
    
@@ -114,7 +114,7 @@ app.post('/api/shorturl/new', function (req, res) {
       })
     }).catch(err => {
         console.log('could not submit url')
-        //console.log(err)
+        console.log(err)
     })
   } 
 })

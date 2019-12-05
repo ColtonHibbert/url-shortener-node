@@ -43,7 +43,7 @@ app.get('/', function(req, res){
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-app.get('api/shorturl/*', function (req, res) {
+app.get('/api/shorturl/*', function (req, res) {
   console.log("get was hit")
     const requestParam = req.params[0]
     db.transaction(trx => {
@@ -62,77 +62,66 @@ app.get('api/shorturl/*', function (req, res) {
 
 app.post('/api/shorturl/new', function (req, res) {
   console.log("new was pinged")
-  console.log(req.params[0])
-  const requestParam = req.params[0]
   const input = req.body.url
-  if (input && requestParam === "new" ) {
-    (async () => {
-      console.log("here is the input", input)
-      const addressRegex = /https?:\/\/www./i;
-      const addressValid = input.search(addressRegex)
-      console.log("the address is ", addressValid)
-      if(addressValid === -1) {
+  if (input) {
+    console.log("here is the input", input)
+    const addressRegex = /https?:\/\/www./i;
+    const addressValid = input.search(addressRegex)
+    console.log("the address is ", addressValid)
+    if(addressValid === -1) {
+      res.json({"error": "invalid URL"})
+      return
+    }
+    const dnsInput = input.replace(addressRegex, "")
+    console.log("here is the input after replace method", input)
+    console.log("here is the dnsinput", dnsInput)
+    dns.lookup(dnsInput, (err, address, family) => {
+      console.log(err, address, family)
+      if(err) {
         res.json({"error": "invalid URL"})
         return
       }
-      const dnsInput = input.replace(addressRegex, "")
-      console.log("here is the input after replace method", input)
-      console.log("here is the dnsinput", dnsInput)
-      dns.lookup(dnsInput, (err, address, family) => {
-        console.log(err, address, family)
-        if(err) {
-          res.json({"error": "invalid URL"})
-          return
-        }
+    })
+
+    db.transaction(trx => {
+      trx.select('*').from('urls').where('url', '=', input).then(data => {
+        console.log("url was found",data[0])
+        res.json({"original_url": data[0].url, "short_url": data[0].id })
+      }).catch(err => {
+        console.log('could not locate url')
+        //console.log(err)
       })
-
-      db.transaction(trx => {
-          trx.select('*').from('urls').where('url', '=', input).then(data => {
-            console.log("url was found",data[0])
-            res.json({"original_url": data[0].url, "short_url": data[0].id })
-          }).catch(err => {
-            console.log('could not locate url')
-            //console.log(err)
-          })
-        }).catch(err => {
-          console.log('could not locate url')
-          //console.log(err)
-        })
+    }).catch(err => {
+      console.log('could not locate url')
+      //console.log(err)
+    })
         
-      
-        console.log("should run more below")
-        console.log("here is input again", input)
-        db.transaction(trx => {
-          trx('urls')
-          .returning("*")
-          .insert({
-            url: input
-          })
-          .then(data => {
-            console.log("url was created", data[0])
-            res.json({"original_url": data[0].url, "short_url": data[0].id })
-          })
-          .then(trx.commit)
-          .catch(err => {
-            trx.rollback
-            console.log('could not submit url')
-            console.log(err)
-          })
-        }).catch(err => {
-            console.log('could not submit url')
-            //console.log(err)
-        })
-      
-    })()
-    
+    console.log("should run more below")
+    console.log("here is input again", input)
+    db.transaction(trx => {
+      trx('urls')
+      .returning("*")
+      .insert({
+        url: input
+      })
+      .then(data => {
+        console.log("url was created", data[0])
+        res.json({"original_url": data[0].url, "short_url": data[0].id })
+      })
+      .then(trx.commit)
+      .catch(err => {
+        trx.rollback
+        console.log('could not submit url')
+        console.log(err)
+      })
+    }).catch(err => {
+        console.log('could not submit url')
+        //console.log(err)
+    })
   } 
- 
 })
 
-app.get('/api/shorturl/*', function(req, res) {
-  
-})
-  
+
 // your first API endpoint... 
 app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});

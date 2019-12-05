@@ -48,7 +48,7 @@ app.get('/api/shorturl/*', function (req, res) {
     const requestParam = req.params[0]
     db.transaction(trx => {
       trx.select('*').from('urls').where('id', '=', requestParam).then(data => {
-        console.log("url was found",data[0])
+        //console.log("url was found",data[0])
         res.redirect(data[0].url)
       }).catch(err => {
         console.log('could not locate url')
@@ -61,20 +61,20 @@ app.get('/api/shorturl/*', function (req, res) {
 })
 
 app.post('/api/shorturl/new', function (req, res) {
-  console.log("new was pinged")
+  //console.log("new was pinged")
   const input = req.body.url
   if (input) {
-    console.log("here is the input", input)
+    //console.log("here is the input", input)
     const addressRegex = /https?:\/\/www./i;
     const addressValid = input.search(addressRegex)
-    console.log("the address is ", addressValid)
+    //console.log("the address is ", addressValid)
     if(addressValid === -1) {
       res.json({"error": "invalid URL"})
       return
     }
     const dnsInput = input.replace(addressRegex, "")
-    console.log("here is the input after replace method", input)
-    console.log("here is the dnsinput", dnsInput)
+    //console.log("here is the input after replace method", input)
+    //console.log("here is the dnsinput", dnsInput)
     dns.lookup(dnsInput, (err, address, family) => {
       console.log(err, address, family)
       if(err) {
@@ -85,7 +85,7 @@ app.post('/api/shorturl/new', function (req, res) {
 
     db.transaction(trx => {
       trx.select('*').from('urls').where('url', '=', input).then(data => {
-        console.log("url was found",data[0])
+        //console.log("url was found",data[0])
         res.json({"original_url": data[0].url, "short_url": data[0].id })
       }).catch(err => {
         console.log('could not locate url')
@@ -96,8 +96,7 @@ app.post('/api/shorturl/new', function (req, res) {
       //console.log(err)
     })
         
-    console.log("should run more below")
-    console.log("here is input again", input)
+   
     db.transaction(trx => {
       trx('urls')
       .returning("*")
@@ -105,14 +104,14 @@ app.post('/api/shorturl/new', function (req, res) {
         url: input
       })
       .then(data => {
-        console.log("url was created", data[0])
+        //console.log("url was created", data[0])
         res.json({"original_url": data[0].url, "short_url": data[0].id })
       })
       .then(trx.commit)
       .catch(err => {
         trx.rollback
         console.log('could not submit url')
-        console.log(err)
+        //console.log(err)
       })
     }).catch(err => {
         console.log('could not submit url')

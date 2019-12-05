@@ -24,7 +24,8 @@ const db = knex({
 
 const dns = require('dns');
 // Basic Configuration 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT;
+// || 3000
 
 /** this project needs a db !! **/ 
 // mongoose.connect(process.env.MONGOLAB_URI);

@@ -9,22 +9,26 @@
       <link href="/public/style.css" rel="stylesheet" type="text/css">
    
     <script>
-      const urlInputHandler = () => {
-        const urlInput = document.getElementById("url_input").value;
-        fetch('http://localhost:3000/api/shorturl/new',
-          {
-            method: "POST",
-            headers: {'Content-Type': "application/json"},
-            body: JSON.stringify({
-              input: urlInput
-            })
-          }
-        ).then(res =>res.json())
-        .then(data => console.log(data)) 
+      
+      // const urlInputHandler = () => {
+        
+      //   const urlInput = document.getElementById("url_input").value;
+      //   fetch('http://localhost:3000/api/shorturl/new',
+      //     {
+      //       method: "POST",
+      //       headers: {'Content-Type': "application/json"},
+      //       body: JSON.stringify({
+      //         input: urlInput
+      //       })
+      //     }
+      //   ).then(res =>res.json())
+      //   .then(data => {
+      //     console.log(data)
+      //   })
         //window.location.href = 'http://localhost:3000/api/shorturl/new';
         //.then(data => console.log(data))
         //.then(() => window.location.href = 'http://localhost:3000/api/shorturl/new')
-      }
+      //}
     </script>
     </head>
 
@@ -43,11 +47,11 @@
         <p>
           example: <code>POST [project_url]/api/shorturl/new</code> - <code>https://www.google.com</code>
         </p>
-        
-          <label for="url_input">URL to be shortened</label>
-          <input id="url_input" type="text" name="url" value="https://www.freecodecamp.org">
-          <button onclick="urlInputHandler()">POST URL</button>
-        
+          <form action="api/shorturl/new" method="POST">
+            <label for="url_input">URL to be shortened</label>
+            <input id="url_input" type="text" name="url" value="https://www.freecodecamp.org">
+            <input type="submit" value="POST URL">
+          </form>
         <h3>Example Usage:</h3>
         <a href="https://thread-paper.glitch.me/api/shorturl/3">
           [this_project_url]/api/shorturl/3

@@ -12,7 +12,7 @@
     "express": "^5.0.0-alpha.2",
     "knex": "^0.20.3",
     "mongodb": "^2.2.5",
-    "mongoose": "^4.5.7",
+    "mongoose": "^4.13.21",
     "pg": "^7.14.0"
   },
   "engines": {
